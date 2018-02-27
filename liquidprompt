@@ -338,24 +338,24 @@ _lp_source_config()
     LP_ENABLE_SUDO=${LP_ENABLE_SUDO:-0}
 
     LP_MARK_DEFAULT="${LP_MARK_DEFAULT:-$_LP_MARK_SYMBOL}"
-    LP_MARK_BATTERY="${LP_MARK_BATTERY:-"⌁"}"
-    LP_MARK_ADAPTER="${LP_MARK_ADAPTER:-"⏚"}"
+    LP_MARK_BATTERY="${LP_MARK_BATTERY:-"$"}"
+    LP_MARK_ADAPTER="${LP_MARK_ADAPTER:-"$"}"
     LP_MARK_LOAD="${LP_MARK_LOAD:-"⌂"}"
     LP_MARK_TEMP="${LP_MARK_TEMP:-"θ"}"
-    LP_MARK_PROXY="${LP_MARK_PROXY:-"↥"}"
-    LP_MARK_HG="${LP_MARK_HG:-"☿"}"
+    LP_MARK_PROXY="${LP_MARK_PROXY:-"$"}"
+    LP_MARK_HG="${LP_MARK_HG:-"$"}"
     LP_MARK_SVN="${LP_MARK_SVN:-"‡"}"
-    LP_MARK_GIT="${LP_MARK_GIT:-"±"}"
-    LP_MARK_VCSH="${LP_MARK_VCSH:-"|"}"
-    LP_MARK_FOSSIL="${LP_MARK_FOSSIL:-"⌘"}"
-    LP_MARK_BZR="${LP_MARK_BZR:-"⚯"}"
-    LP_MARK_DISABLED="${LP_MARK_DISABLED:-"⌀"}"
+    LP_MARK_GIT="${LP_MARK_GIT:-"‡"}"
+    LP_MARK_VCSH="${LP_MARK_VCSH:-"$"}"
+    LP_MARK_FOSSIL="${LP_MARK_FOSSIL:-"$"}"
+    LP_MARK_BZR="${LP_MARK_BZR:-"$"}"
+    LP_MARK_DISABLED="${LP_MARK_DISABLED:-"$"}"
     LP_MARK_UNTRACKED="${LP_MARK_UNTRACKED:-"*"}"
-    LP_MARK_STASH="${LP_MARK_STASH:-"+"}"
+    LP_MARK_STASH="${LP_MARK_STASH:-"‡"}"
     LP_MARK_BRACKET_OPEN="${LP_MARK_BRACKET_OPEN:-"["}"
     LP_MARK_BRACKET_CLOSE="${LP_MARK_BRACKET_CLOSE:-"]"}"
     LP_MARK_SHORTEN_PATH="${LP_MARK_SHORTEN_PATH:-" … "}"
-    LP_MARK_PREFIX="${LP_MARK_PREFIX:-" "}"
+    LP_MARK_PREFIX="${LP_MARK_PREFIX:-""}"
     LP_MARK_PERM="${LP_MARK_PERM:-":"}"
 
     LP_COLOR_PATH=${LP_COLOR_PATH:-$BOLD}
@@ -518,7 +518,7 @@ if [[ "${TERM_PROGRAM-}" == Apple_Terminal ]] && command -v update_terminal_cwd 
     _LP_TERM_UPDATE_DIR=update_terminal_cwd
     # Remove "update_terminal_cwd; " that has been add by Apple in /et/bashrc.
     # See issue #196
-    PROMPT_COMMAND="${PROMPT_COMMAND//update_terminal_cwd; /}"
+    PROMPT_COMMAND="${PROMPT_COMMAND//update_terminal_cwd;/}"
 else
     _LP_TERM_UPDATE_DIR=:
 fi
@@ -641,6 +641,9 @@ if (( LP_HOSTNAME_ALWAYS != -1 )); then
         fi
         ;;
     ssh)
+	if [[ "${LP_HOST}" == "dredc-u3" ]]; then
+	    LP_HOST=""
+	fi
         # If we want a different color for each host
         (( LP_ENABLE_SSH_COLORS )) && LP_COLOR_SSH="$LP_COLOR_HOST_HASH"
         LP_HOST+="${LP_COLOR_SSH}${LP_HOST_SYMBOL}${NO_COL}"
@@ -953,19 +956,19 @@ _lp_git_branch_color()
 
             if [[ -n "$has_commit" ]]; then
                 # Changes to commit and commits to push
-                ret="${LP_COLOR_CHANGES}${branch}${NO_COL}(${LP_COLOR_DIFF}$has_lines${NO_COL},$has_commit)"
+                ret="${LP_COLOR_CHANGES}${LP_MARK_BRACKET_OPEN}${branch}${LP_MARK_BRACKET_CLOSE}${NO_COL}(${LP_COLOR_DIFF}$has_lines${NO_COL},$has_commit)"
             else
-                ret="${LP_COLOR_CHANGES}${branch}${NO_COL}(${LP_COLOR_DIFF}$has_lines${NO_COL})" # changes to commit
+                ret="${LP_COLOR_CHANGES}${LP_MARK_BRACKET_OPEN}${branch}${LP_MARK_BRACKET_CLOSE}${NO_COL}(${LP_COLOR_DIFF}$has_lines${NO_COL})" # changes to commit
             fi
         elif [[ -n "$has_commit" ]]; then
             # some commit(s) to push
             if [[ "$commit_behind" -gt "0" ]]; then
-                ret="${LP_COLOR_COMMITS_BEHIND}${branch}${NO_COL}($has_commit)"
+                ret="${LP_COLOR_COMMITS_BEHIND}${LP_MARK_BRACKET_OPEN}${branch}${LP_MARK_BRACKET_CLOSE}${NO_COL}($has_commit)"
             else
-                ret="${LP_COLOR_COMMITS}${branch}${NO_COL}($has_commit)"
+                ret="${LP_COLOR_COMMITS}${LP_MARK_BRACKET_OPEN}${branch}${LP_MARK_BRACKET_CLOSE}${NO_COL}($has_commit)"
             fi
         else
-            ret="${LP_COLOR_UP}${branch}" # nothing to commit or push
+            ret="${LP_COLOR_UP}${LP_MARK_BRACKET_OPEN}${branch}${LP_MARK_BRACKET_CLOSE}" # nothing to commit or push
         fi
         echo -nE "$ret$end"
     fi
@@ -1609,7 +1612,7 @@ _lp_smart_mark()
 {
     local mark
     case "$LP_VCS_TYPE" in
-    git)      mark="$LP_MARK_GIT"             ;;
+    git)      mark="$LP_MARK_GIT$"             ;;
     git-svn)  mark="$LP_MARK_GIT$LP_MARK_SVN" ;;
     git-vcsh) mark="$LP_MARK_VCSH$LP_MARK_GIT$LP_MARK_VCSH";;
     hg)       mark="$LP_MARK_HG"              ;;
@@ -1619,7 +1622,7 @@ _lp_smart_mark()
     disabled) mark="$LP_MARK_DISABLED"        ;;
     *)        mark="$LP_MARK_DEFAULT"         ;;
     esac
-    echo -nE "${mark}${NO_COL}"
+    echo -nE "${mark}"
 }
 
 # insert a space on the right
